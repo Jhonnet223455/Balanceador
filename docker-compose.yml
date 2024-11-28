@@ -1,0 +1,99 @@
+version: '3.8'
+
+services:
+  # Nginx principal
+  nginx:
+    image: nginx
+    container_name: nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - "C:/Users/jhonm/Desktop/ProyectoFinal/Nginx/nginx.conf:/etc/nginx/nginx.conf"
+    networks:
+      - prometheus-network
+
+  # Web1 (Nginx)
+  web1:
+    image: nginx
+    container_name: web1
+    ports:
+      - "8081:80"
+    volumes:
+      - "C:/Users/jhonm/Desktop/ProyectoFinal/Nginx/nginx.conf:/etc/nginx/nginx.conf"
+    networks:
+      - prometheus-network
+
+  # Web2 (Nginx)
+  web2:
+    image: nginx
+    container_name: web2
+    ports:
+      - "8082:80"
+    volumes:
+      - "C:/Users/jhonm/Desktop/ProyectoFinal/Nginx/nginx.conf:/etc/nginx/nginx.conf"
+    networks:
+      - prometheus-network
+
+  # Exportador de métricas para nginx
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter
+    container_name: nginx-exporter
+    ports:
+      - "9113:9113"
+    environment:
+      - NGINX_HOST=nginx  # Apunta al contenedor 'nginx'
+      - NGINX_PORT=80
+    networks:
+      - prometheus-network
+
+  # Exportador de métricas para web1
+  nginx-exporter-web1:
+    image: nginx/nginx-prometheus-exporter
+    container_name: nginx-exporter-web1
+    ports:
+      - "9114:9113"
+    environment:
+      - NGINX_HOST=web1  # Apunta al contenedor 'web1'
+      - NGINX_PORT=80
+    networks:
+      - prometheus-network
+
+  # Exportador de métricas para web2
+  nginx-exporter-web2:
+    image: nginx/nginx-prometheus-exporter
+    container_name: nginx-exporter-web2
+    ports:
+      - "9115:9113"
+    environment:
+      - NGINX_HOST=web2  # Apunta al contenedor 'web2'
+      - NGINX_PORT=80
+    networks:
+      - prometheus-network
+
+  # Servicio de Prometheus
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - "C:/Users/jhonm/Desktop/ProyectoFinal/Prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
+    networks:
+      - prometheus-network
+
+  # Servicio de Grafana
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: "admin"  # Contraseña para Grafana
+    networks:
+      - prometheus-network
+    depends_on:
+      - prometheus
+
+networks:
+  prometheus-network:
+    driver: bridge

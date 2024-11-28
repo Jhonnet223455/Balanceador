@@ -1,0 +1,15 @@
+scrape_configs:
+  - job_name: 'nginx-exporter'
+    static_configs:
+      - targets:
+          - 'nginx-exporter:9113'
+
+  - job_name: 'nginx-exporter-web1'
+    static_configs:
+      - targets:
+          - 'nginx-exporter-web1:9113'
+
+  - job_name: 'nginx-exporter-web2'
+    static_configs:
+      - targets:
+          - 'nginx-exporter-web2:9113'
